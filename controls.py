@@ -35,6 +35,7 @@ class Controller:
 
     def stop(self):
         if(self.controller_type == "motor"):
+            # YEET
             self.driver.control(65)
 
     def motor(self, duration, power):
