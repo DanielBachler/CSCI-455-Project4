@@ -22,15 +22,15 @@ class Controller:
         print("Updated command")
 
     def parsePercentage(self, inPercentage):
-        if(self.controller_type == "motor"):
-            if(inPercentage < 0): #Forward range
-                return (50*inPercentage) #Returns a negative
-            if(inPercentage >= 0):
-                return (20*inPercentage)  
+        if(inPercentage < 0): #Forward range
+            return (50*inPercentage) #Returns a negative
+        if(inPercentage >= 0):
+            return (20*inPercentage)  
 
     def accelerate(self,inValue): #assumes we know the controller type. 
+        
         print("inValue:", inValue)
-        if(self.controller_type == "motor"):
+        if(self.controller_type == "motor" and self.turning == False):
             if(inValue < 0):
                 for i in range(int(round(abs(inValue)/200, 0))):
                     time.sleep(0.01)
@@ -38,15 +38,51 @@ class Controller:
             if(inValue > 0):
                 for i in range(int(round(abs(inValue)/200, 0))):
                     time.sleep(0.01)
-                    self.driver.control(104)                                
-
+                    self.driver.control(104)
+        if(self.controller_type == "motor" and self.turning == True):
+            if(inValue < 0):
+                for i in range(int(round(abs(inValue)/200, 0))):
+                    time.sleep(0.01)
+                    self.driver.control(102)  
+            if(inValue > 0):
+                for i in range(int(round(abs(inValue)/100, 0))):
+                    time.sleep(0.01)
+                    self.driver.control(100)                                                      
+        if(self.controller_type == "body_turn"):
+            if(inValue < 0):
+                for i in range(int(round(abs(inValue)/200, 0))):
+                    time.sleep(0.01)
+                    self.driver.control(40)  
+            if(inValue > 0):
+                for i in range(int(round(abs(inValue)/200, 0))):
+                    time.sleep(0.01)
+                    self.driver.control(38)
+        if(self.controller_type == "head_tilt"):
+            if(inValue < 0):
+                for i in range(int(round(abs(inValue)/200, 0))):
+                    time.sleep(0.01)
+                    self.driver.control(52)  
+            if(inValue > 0):
+                for i in range(int(round(abs(inValue)/200, 0))):
+                    time.sleep(0.01)
+                    self.driver.control(54) 
+        if(self.controller_type == "head_turn"):
+            if(inValue < 0):
+                for i in range(int(round(abs(inValue)/200, 0))):
+                    time.sleep(0.01)
+                    self.driver.control(24)  
+            if(inValue > 0):
+                for i in range(int(round(abs(inValue)/200, 0))):
+                    time.sleep(0.01)
+                    self.driver.control(26)                                                           
     def stop(self):
-        if(self.controller_type == "motor"):
-            # YEET
-            self.driver.control(65)
+        self.driver.control(65)
 
     def run(self):
         print("Power:", self.power)
-        self.accelerate(self.parsePercentage(self.power)) 
+        try:
+            self.accelerate(self.parsePercentage(self.power))
+        except:
+            print("Missing Commmand.") 
         time.sleep(self.duration)
         self.stop()
