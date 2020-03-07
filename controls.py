@@ -26,17 +26,16 @@ class Controller:
                 return (50*inPercentage)  
 
     def accelerate(self,inValue): #assumes we know the controller type. 
+        print("inValue:", inValue)
         if(self.controller_type == "motor"):
-            if(inValue < 0):
-                for i in range(abs(inValue)):
-                    time.sleep(.01)
-                    self.driver.control(98)
-
-                    
+            if(inValue < 6000):
+                for i in range(int(round(abs(inValue)/200, 0))):
+                    time.sleep(0.2)
+                    self.driver.control(98)             
 
     def stop(self):
         if(self.controller_type == "motor"):
-            robotDriver.motors = 6000
+            self.driver.control(65)
 
     def motor(self, duration, power):
         # start_time = time.time()
@@ -44,7 +43,8 @@ class Controller:
         #     accelerate(parsePercentage(20))
         #     time.sleep(start_time + i*duration - time.time())
         # self.stop()
-        self.accelerate(self.parsePercentage(self.power)) 
+        print("Power:", power)
+        self.accelerate(self.parsePercentage(power)) 
         time.sleep(self.duration)
         self.stop()
 
