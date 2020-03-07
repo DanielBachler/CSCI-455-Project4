@@ -31,12 +31,20 @@ class Controller:
                 for i in range(inValue):
                     time.sleep(.01)
                     robotDriver.motors -= 1
+
     def stop(self):
         if(self.controller_type == "motor"):
             robotDriver.motors = 6000
+
     def motor(self, duration, power):
-        start_time = time.time()
-        for i in range(duration):
-            time.sleep(start_time + i*duration - time.time())
-            accelerate(parsePercentage(20))
-        stop() 
+        # start_time = time.time()
+        # for i in range(duration):
+        #     accelerate(parsePercentage(20))
+        #     time.sleep(start_time + i*duration - time.time())
+        # self.stop()
+        self.accelerate(self.parsePercentage(self.power)) 
+        time.sleep(self.duration)
+        self.stop()
+
+    def run(self):
+        self.motor(self.duration, self.power)
