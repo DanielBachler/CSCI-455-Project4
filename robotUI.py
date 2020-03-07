@@ -3,7 +3,7 @@ import robotDriver
 import controls
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QIcon, QPixmap, QImage
+from PyQt5.QtGui import QIcon, QPixmap, QImage, QFont
 
 app = None
 
@@ -271,6 +271,9 @@ class ConfigUI(QWidget):
     # Spot var
     spot = None
 
+    # Global font for object
+    font = QFont("Comic Sans", 20)
+
     def __init__(self, parent_window, control_object, spot):
         super().__init__()
         self.parent_window = parent_window
@@ -281,6 +284,7 @@ class ConfigUI(QWidget):
         # Add edit forms here
         # Time duration field (QDoubleSpinBox)
         time_duration_label = QLabel("Duration:")
+        time_duration_label.setFont(self.font)
         time_duration = QDoubleSpinBox()
         time_duration.setObjectName("time_duration")
         # Set properties for box
@@ -292,7 +296,9 @@ class ConfigUI(QWidget):
             # Precision
         time_duration.setDecimals(1)
             # init value
-        time_duration.setValue(0.0)
+        time_duration.setValue(self.control_object.duration)
+        time_duration.setMinimumHeight(50)
+        time_duration.setFont(self.font)
 
             # Box for time duration
         time_duration_box = QHBoxLayout()
@@ -301,15 +307,19 @@ class ConfigUI(QWidget):
 
         # Power input box (QSpinBox)
         power_label = QLabel("Power:")
+        power_label.setFont(self.font)
         power = QSpinBox()
         power.setObjectName("power")
         # Set properties
             # Max and min values
-        power.setMinimum(0)
+        power.setMinimum(-100)
         power.setMaximum(100)
             # Interval
         power.setSingleStep(5)
-        power.setValue(0)
+        power.setSuffix("%")
+        power.setValue(self.control_object.power)
+        power.setMinimumHeight(50)
+        power.setFont(self.font)
 
             # Box for power
         power_box = QHBoxLayout()
