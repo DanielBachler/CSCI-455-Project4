@@ -30,7 +30,7 @@ class Controller:
             if(inValue < 0):
                 for i in range(abs(inValue)):
                     time.sleep(.01)
-                    
+                    self.driver.control(98)
 
                     
 
