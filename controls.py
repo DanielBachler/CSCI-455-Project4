@@ -4,7 +4,7 @@ import robotDriver
 class Controller:
     # Has the 5 types with different functions based on type
     controller_type = ""
-
+    driver = robotDriver.RobotControl() 
     # Temp data for testing
     duration = 0
     # Use percentage of total speed (more user friendly)
@@ -28,12 +28,16 @@ class Controller:
     def accelerate(self,inValue): #assumes we know the controller type. 
         if(self.controller_type == "motor"):
             if(inValue < 0):
-                for i in range(inValue):
+                for i in range(abs(inValue)):
                     time.sleep(.01)
-                    robotDriver.motors -= 1
+                    
+
+                    
+
     def stop(self):
         if(self.controller_type == "motor"):
             robotDriver.motors = 6000
+
     def motor(self, duration, power):
         start_time = time.time()
         for i in range(duration):
