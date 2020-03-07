@@ -26,31 +26,27 @@ class Controller:
             if(inPercentage < 0): #Forward range
                 return (-50*inPercentage) #Returns a negative
             if(inPercentage >= 0):
-                return (50*inPercentage)  
+                return (20*inPercentage)  
 
     def accelerate(self,inValue): #assumes we know the controller type. 
         print("inValue:", inValue)
         if(self.controller_type == "motor"):
             if(inValue < 6000):
                 for i in range(int(round(abs(inValue)/200, 0))):
-                    time.sleep(0.2)
-                    self.driver.control(98)             
+                    time.sleep(0.01)
+                    self.driver.control(98)  
+            if(inValue > 6000):
+                for i in range(int(round(abs(inValue)/200, 0))):
+                    time.sleep(0.01)
+                    self.driver.control(98)                                
 
     def stop(self):
         if(self.controller_type == "motor"):
             # YEET
             self.driver.control(65)
 
-    def motor(self, duration, power):
-        # start_time = time.time()
-        # for i in range(duration):
-        #     accelerate(parsePercentage(20))
-        #     time.sleep(start_time + i*duration - time.time())
-        # self.stop()
-        print("Power:", power)
-        self.accelerate(self.parsePercentage(power)) 
+    def run(self):
+        print("Power:", self.power)
+        self.accelerate(self.parsePercentage(self.power)) 
         time.sleep(self.duration)
         self.stop()
-
-    def run(self):
-        self.motor(self.duration, self.power)
