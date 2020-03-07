@@ -209,7 +209,8 @@ class UI(QMainWindow):
         for i in range(0,8):
             self.animation_labels[i].setText("Running")
             self.animation_labels[i].repaint()
-            time.sleep(1)
+            if self.command_list[i] == "motor":
+                self.controllers[i].run()
             self.animation_labels[i].setText("")
             self.animation_labels[i].repaint()
 
