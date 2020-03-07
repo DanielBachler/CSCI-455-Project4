@@ -1,5 +1,5 @@
 import sys
-import robotDriver
+import time
 import controls
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
@@ -33,6 +33,9 @@ class UI(QMainWindow):
 
     # List of images
     instructions = []
+
+    # List of animation labels
+    animation_labels = []
 
     # Button Size controller
     btn_size = QSize(80,80)
@@ -119,6 +122,13 @@ class UI(QMainWindow):
             config_button.setFixedWidth(80)
             self.config_buttons.append(config_button)
 
+            # Make animation label
+            animation_label = QLabel("")
+            a_name = "animation_label" + str(i)
+            animation_label.setObjectName(a_name)
+            animation_label.setFixedWidth(80)
+            self.animation_labels.append(animation_label)
+
         # Set up config buttons clicked commands
         self.config_buttons[0].clicked.connect(lambda: self.configure_command(self.config_buttons[0].objectName()))
         self.config_buttons[1].clicked.connect(lambda: self.configure_command(self.config_buttons[1].objectName()))
@@ -151,8 +161,9 @@ class UI(QMainWindow):
         image_grid = QGridLayout()
         for i in range(0,8):
             # Add command to layout
-            image_grid.addWidget(self.instructions[i], 0, i)
-            image_grid.addWidget(self.config_buttons[i], 1, i)
+            image_grid.addWidget(self.animation_labels[i], 0, i)
+            image_grid.addWidget(self.instructions[i], 1, i)
+            image_grid.addWidget(self.config_buttons[i], 2, i)
 
         # HBox for start and stop
         start_stop_box = QHBoxLayout()
@@ -176,8 +187,6 @@ class UI(QMainWindow):
         # Add to main box
         main_hbox.addLayout(command_box)
         main_hbox.addLayout(button_command_box)
-        #main_hbox.addLayout(image_grid)
-        #main_hbox.addLayout(start_stop_box)
 
         # Set layout on central widget
         central_widget.setLayout(main_hbox)
@@ -194,6 +203,15 @@ class UI(QMainWindow):
         print("---------")
         for command in self.command_list:
             print(command)
+        # Animation size
+        animation_size = QSize(90,80)
+        # New run with "animation"
+        for i in range(0,8):
+            self.animation_labels[i].setText("Running")
+            self.animation_labels[i].repaint()
+            time.sleep(1)
+            self.animation_labels[i].setText("")
+            self.animation_labels[i].repaint()
 
     # stop_robot: Stops the robot executing the current sequence
     # ARGS: None
