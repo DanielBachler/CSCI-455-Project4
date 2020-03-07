@@ -1,4 +1,3 @@
-import tkinter as tk
 from maestro import Controller
 
 MOTORS_FORWARD = 0

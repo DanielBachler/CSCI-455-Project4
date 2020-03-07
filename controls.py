@@ -9,13 +9,16 @@ class Controller:
     duration = 0
     # Use percentage of total speed (more user friendly)
     power = 0 
+    # Turning, only for motor type
+    turning = False
 
     def __init__(self, controller_type):
         self.controller_type = controller_type
 
-    def update(self, duration, power):
+    def update(self, duration, power, turning=False):
         self.duration = duration
         self.power = power
+        self.turning = turning
         print("Updated command")
 
     def parsePercentage(self, inPercentage):

@@ -335,15 +335,31 @@ class ConfigUI(QWidget):
         power.setMaximum(100)
             # Interval
         power.setSingleStep(5)
+            # Set suffix for input box
         power.setSuffix("%")
+            # Set value to control object value
         power.setValue(self.control_object.power)
+            # Set size
         power.setMinimumHeight(50)
+            # Set font
         power.setFont(self.font)
 
             # Box for power
         power_box = QHBoxLayout()
         power_box.addWidget(power_label)
         power_box.addWidget(power)
+
+        # Turn checkbox if right type of control
+        checkbox_box = QHBoxLayout()
+        if self.control_object.controller_type == "motor":
+            checkbox_label = QLabel("Turning?")
+            checkbox_label.setFont(self.font)
+            checkbox = QCheckBox()
+            checkbox.setObjectName("turning")
+            checkbox.setChecked(self.control_object.turning)
+
+            checkbox_box.addWidget(checkbox_label)
+            checkbox_box.addWidget(checkbox)
 
         # Update and close button
         update_button = QPushButton("Update")
@@ -361,6 +377,7 @@ class ConfigUI(QWidget):
         main_box = QVBoxLayout()
         main_box.addLayout(time_duration_box)
         main_box.addLayout(power_box)
+        main_box.addLayout(checkbox_box)
         main_box.addLayout(button_box)
 
         # Set main_box as main layout
@@ -375,7 +392,11 @@ class ConfigUI(QWidget):
         # Get input fields
         time_duration = self.findChild(QDoubleSpinBox, "time_duration")
         power = self.findChild(QSpinBox, "power")
-        self.control_object.update(time_duration.value(), power.value())
+        turning = False
+        # Only check that box if on motors type
+        if self.control_object.controller_type == "motor":
+            turning = self.findChild(QCheckBox, "turning").isChecked()
+        self.control_object.update(time_duration.value(), power.value(), turning)
         self.close()
 
 main()
