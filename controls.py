@@ -43,7 +43,7 @@ class Controller:
             self.driver.control(65)
 
     def run(self):
-        print("Power:", power)
-        self.accelerate(self.parsePercentage(power)) 
+        print("Power:", self.power)
+        self.accelerate(self.parsePercentage(self.power)) 
         time.sleep(self.duration)
         self.stop()
