@@ -1,5 +1,6 @@
 import sys
 import robotDriver
+import controls
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon, QPixmap, QImage
@@ -21,6 +22,9 @@ class UI(QMainWindow):
     # List of commands to be executed
     command_list = [None] * 8
 
+    # List of control objects
+    controllers = [None] * 8
+
     # Current head position
     head_pos = 0
 
@@ -32,6 +36,9 @@ class UI(QMainWindow):
 
     # Button Size controller
     btn_size = QSize(100,100)
+
+    # Blank config window
+    config_window = ""
 
     def __init__(self):
         super().__init__()
@@ -55,35 +62,35 @@ class UI(QMainWindow):
         motors.setIcon(QIcon("images/motors.png"))
         motors.setIconSize(self.btn_size)
         motors.setFixedSize(self.btn_size)
-        motors.clicked.connect(self.add_motor)
+        motors.clicked.connect(lambda: self.add_command("motor"))
 
         # Headtilt
         headtilt = QPushButton()
         headtilt.setIcon(QIcon("images/headtilt.png"))
         headtilt.setIconSize(self.btn_size)
         headtilt.setFixedSize(self.btn_size)
-        headtilt.clicked.connect(self.add_head_tilt)
+        headtilt.clicked.connect(lambda: self.add_command("head_tilt"))
 
         # Headturn
         headturn = QPushButton()
         headturn.setIcon(QIcon("images/headturn.png"))
         headturn.setIconSize(self.btn_size)
         headturn.setFixedSize(self.btn_size)
-        headturn.clicked.connect(self.add_head_turn)
+        headturn.clicked.connect(lambda: self.add_command("head_turn"))
 
         # Bodyturn
         bodyturn = QPushButton()
         bodyturn.setIcon(QIcon("images/bodyturn.png"))
         bodyturn.setIconSize(self.btn_size)
         bodyturn.setFixedSize(self.btn_size)
-        bodyturn.clicked.connect(self.add_body_turn)
+        bodyturn.clicked.connect(lambda: self.add_command("body_turn"))
 
         # Pause
         pause = QPushButton()
         pause.setIcon(QIcon("images/pause.png"))
         pause.setIconSize(self.btn_size)
         pause.setFixedSize(self.btn_size)
-        pause.clicked.connect(self.pause)
+        pause.clicked.connect(lambda: self.add_command("pause"))
 
         # 8 Instruction boxes, use image sized buttons for it, each gets its own configure button
         # Default icon
@@ -113,14 +120,14 @@ class UI(QMainWindow):
             self.config_buttons.append(config_button)
 
         # Set up config buttons clicked commands
-        self.config_buttons[0].clicked.connect(lambda: self.configure_command(config_buttons[0].objectName()))
-        self.config_buttons[1].clicked.connect(lambda: self.configure_command(config_buttons[1].objectName()))
-        self.config_buttons[2].clicked.connect(lambda: self.configure_command(config_buttons[2].objectName()))
-        self.config_buttons[3].clicked.connect(lambda: self.configure_command(config_buttons[3].objectName()))
-        self.config_buttons[4].clicked.connect(lambda: self.configure_command(config_buttons[4].objectName()))
-        self.config_buttons[5].clicked.connect(lambda: self.configure_command(config_buttons[5].objectName()))
-        self.config_buttons[6].clicked.connect(lambda: self.configure_command(config_buttons[6].objectName()))
-        self.config_buttons[7].clicked.connect(lambda: self.configure_command(config_buttons[7].objectName()))
+        self.config_buttons[0].clicked.connect(lambda: self.configure_command(self.config_buttons[0].objectName()))
+        self.config_buttons[1].clicked.connect(lambda: self.configure_command(self.config_buttons[1].objectName()))
+        self.config_buttons[2].clicked.connect(lambda: self.configure_command(self.config_buttons[2].objectName()))
+        self.config_buttons[3].clicked.connect(lambda: self.configure_command(self.config_buttons[3].objectName()))
+        self.config_buttons[4].clicked.connect(lambda: self.configure_command(self.config_buttons[4].objectName()))
+        self.config_buttons[5].clicked.connect(lambda: self.configure_command(self.config_buttons[5].objectName()))
+        self.config_buttons[6].clicked.connect(lambda: self.configure_command(self.config_buttons[6].objectName()))
+        self.config_buttons[7].clicked.connect(lambda: self.configure_command(self.config_buttons[7].objectName()))
 
         # Play and stop button
         start_button = QPushButton("Start")
@@ -192,7 +199,15 @@ class UI(QMainWindow):
     # ARGS: None?
     # RETURNS: None
     def configure_command(self, button):
-        print(button)
+        index = int(button[-1])
+        # Error checking to ensure you cant configure a command that doesnt exist
+        if self.command_list[index] is not None:
+            control_object = self.controllers[index]
+            # Make config window
+            self.edit_window = ConfigUI(self, control_object, index)
+            self.edit_window.init_UI()
+        else:
+            QMessageBox.question(self, "Error", "No command to configure", QMessageBox.Close, QMessageBox.Close)
 
     # remove: Removes the last added command
     # ARGS: None
@@ -201,64 +216,23 @@ class UI(QMainWindow):
         if self.head_pos > 0:
             self.head_pos -= 1
             self.command_list[self.head_pos] = None
+            self.controllers[self.head_pos] = None
             self.update_commands()
         else:
-            print("Cannot remove command")
+            QMessageBox.question(self, "Error", "Cannot remove more commands", QMessageBox.Close, QMessageBox.Close)
 
-    # 
-    #
-    #
-    def add_motor(self):
+    # add_commands: Refactored version of command adding functions, pass in args with lambda function
+    # ARGS: command (String)
+    # RETURNS: None
+    def add_command(self, command):
         if self.head_pos < 8:
-            self.command_list[self.head_pos] = "motor"
+            self.command_list[self.head_pos] = command
+            temp_controller = controls.Controller(command)
+            self.controllers[self.head_pos] = temp_controller
             self.head_pos += 1
             self.update_commands()
-        else: 
-            print("Cannot add more commands")
-    
-    #
-    #
-    #
-    def add_head_tilt(self):
-        if self.head_pos < 8:
-            self.command_list[self.head_pos] = "head_tilt"
-            self.head_pos += 1
-            self.update_commands()
-        else: 
-            print("Cannot add more commands")
-    
-    #
-    #
-    #
-    def add_head_turn(self):
-        if self.head_pos < 8:
-            self.command_list[self.head_pos] = "head_turn"
-            self.head_pos += 1
-            self.update_commands()
-        else: 
-            print("Cannot add more commands")
-
-    # 
-    #
-    #
-    def add_body_turn(self):
-        if self.head_pos < 8:
-            self.command_list[self.head_pos] = "body_turn"
-            self.head_pos += 1
-            self.update_commands()
-        else: 
-            print("Cannot add more commands")
-    
-    #
-    #
-    #
-    def pause(self):
-        if self.head_pos < 8:
-            self.command_list[self.head_pos] = "pause"
-            self.head_pos += 1
-            self.update_commands()
-        else: 
-            print("Cannot add more commands")
+        else:
+            QMessageBox.question(self, "Error", "Cannot add more commands", QMessageBox.Close, QMessageBox.Close)
 
     def update_commands(self):
         for i in range(0,8):
@@ -280,6 +254,94 @@ class UI(QMainWindow):
             cur_instruction.setIcon(icon)
             cur_instruction.setFixedSize(self.btn_size)
             cur_instruction.setIconSize(self.btn_size)
-   
+
+class ConfigUI(QWidget):
+    # The parent window
+    parent_window = QMainWindow
+
+    # Object of control type
+    control_object = controls.Controller
+
+    # Spot var
+    spot = None
+
+    def __init__(self, parent_window, control_object, spot):
+        super().__init__()
+        self.parent_window = parent_window
+        self.control_object = control_object
+        self.spot = spot
+
+    def init_UI(self):
+        # Add edit forms here
+        # Time duration field (QDoubleSpinBox)
+        time_duration_label = QLabel("Duration:")
+        time_duration = QDoubleSpinBox()
+        time_duration.setObjectName("time_duration")
+        # Set properties for box
+            # Max and min values
+        time_duration.setMaximum(50.0)
+        time_duration.setMinimum(0.0)
+            # Step
+        time_duration.setSingleStep(0.1)
+            # Precision
+        time_duration.setDecimals(1)
+            # init value
+        time_duration.setValue(0.0)
+
+            # Box for time duration
+        time_duration_box = QHBoxLayout()
+        time_duration_box.addWidget(time_duration_label)
+        time_duration_box.addWidget(time_duration)
+
+        # Power input box (QSpinBox)
+        power_label = QLabel("Power:")
+        power = QSpinBox()
+        power.setObjectName("power")
+        # Set properties
+            # Max and min values
+        power.setMinimum(0)
+        power.setMaximum(100)
+            # Interval
+        power.setSingleStep(5)
+        power.setValue(0)
+
+            # Box for power
+        power_box = QHBoxLayout()
+        power_box.addWidget(power_label)
+        power_box.addWidget(power)
+
+        # Update and close button
+        update_button = QPushButton("Update")
+        update_button.clicked.connect(self.update)
+
+        cancel_button = QPushButton("Cancel")
+        cancel_button.clicked.connect(self.close)
+
+        # Button box
+        button_box = QHBoxLayout()
+        button_box.addWidget(update_button)
+        button_box.addWidget(cancel_button)
+
+        # Main Box
+        main_box = QVBoxLayout()
+        main_box.addLayout(time_duration_box)
+        main_box.addLayout(power_box)
+        main_box.addLayout(button_box)
+
+        # Set main_box as main layout
+        self.setLayout(main_box)
+
+        # Finalize window
+        self.setGeometry(300, 300, 400, 300)
+        self.setWindowTitle('Configure %s at spot %d' % (self.control_object.controller_type, self.spot))
+        self.show()
+
+    def update(self):
+        # Get input fields
+        time_duration = self.findChild(QDoubleSpinBox, "time_duration")
+        power = self.findChild(QSpinBox, "power")
+        self.control_object.update(time_duration.value(), power.value())
+        self.close()
+
 main()
     
