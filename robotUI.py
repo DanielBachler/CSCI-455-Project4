@@ -35,7 +35,7 @@ class UI(QMainWindow):
     instructions = []
 
     # Button Size controller
-    btn_size = QSize(100,100)
+    btn_size = QSize(80,80)
 
     # Blank config window
     config_window = ""
@@ -116,7 +116,7 @@ class UI(QMainWindow):
             config_button = QPushButton("Configure\nCommand")
             c_name = "config_btn" + str(i)
             config_button.setObjectName(c_name)
-            config_button.setFixedWidth(100)
+            config_button.setFixedWidth(80)
             self.config_buttons.append(config_button)
 
         # Set up config buttons clicked commands
@@ -154,11 +154,16 @@ class UI(QMainWindow):
             image_grid.addWidget(self.instructions[i], 0, i)
             image_grid.addWidget(self.config_buttons[i], 1, i)
 
-        # VBox for start and stop
-        start_stop_box = QVBoxLayout()
+        # HBox for start and stop
+        start_stop_box = QHBoxLayout()
         start_stop_box.addWidget(start_button)
         start_stop_box.addWidget(remove_last_added)
         start_stop_box.addWidget(stop_button)
+
+        # Vbox for buttons and command images
+        button_command_box = QVBoxLayout()
+        button_command_box.addLayout(start_stop_box)
+        button_command_box.addLayout(image_grid)
 
         # VBox for QList and configure button
         command_box = QVBoxLayout()
@@ -170,14 +175,15 @@ class UI(QMainWindow):
 
         # Add to main box
         main_hbox.addLayout(command_box)
-        main_hbox.addLayout(image_grid)
-        main_hbox.addLayout(start_stop_box)
+        main_hbox.addLayout(button_command_box)
+        #main_hbox.addLayout(image_grid)
+        #main_hbox.addLayout(start_stop_box)
 
         # Set layout on central widget
         central_widget.setLayout(main_hbox)
 
         # Finalize geometry
-        self.setGeometry(300, 300, 600, 300)
+        self.setGeometry(0, 0, 480, 200)
         self.setWindowTitle('Robot Control UI')
         self.show()
 
@@ -332,7 +338,7 @@ class ConfigUI(QWidget):
         self.setLayout(main_box)
 
         # Finalize window
-        self.setGeometry(300, 300, 400, 300)
+        self.setGeometry(200, 50, 400, 300)
         self.setWindowTitle('Configure %s at spot %d' % (self.control_object.controller_type, self.spot))
         self.show()
 
